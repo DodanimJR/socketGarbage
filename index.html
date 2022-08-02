@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <meta http-equiv="X-UA-Compatible" content="IE=edge">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Document</title>
+</head>
+<body>  
+<form class="username-form" action="">
+    <input id="username-input" placeholder="Username"></input>
+    <button id="create-user-btn">Join Chat</button>
+</form>
+<div id="listas" style="display: flex;">
+    
+    <div id="usrContainer">
+        <ul id="users"></ul>
+    </div>
+    <form id="form" action="">
+        <input type="text" name="" id="input"><button>Send</button>
+     </form>
+    <div id="msgContainer">
+        <ul id="messages"></ul>
+    </div>
+
+</div>
+ 
+ 
+ 
+ <script src="socket.io/socket.io.js"></script>
+ <script>
+    var socket = io();
+    var messages = document.getElementById('messages');
+    var users = document.getElementById('users')
+    var form = document.getElementById('form');
+    var input = document.getElementById('input');
+    var createUser = document.getElementById("create-user-btn");
+    var inputUser = document.getElementById("username-input");
+
+    createUser.addEventListener('click', function(e){
+        e.preventDefault();
+        if (inputUser.value) {
+            console.log('CLICKEADo');
+            socket.emit('new user', inputUser.value);
+            console.log(inputUser.value);
+            inputUser.value = '';
+        }
+        
+    });
+    
+    
+    form.addEventListener('submit', function(e) {
+    e.preventDefault();
+        if(input.value) {
+        socket.emit('mensajeDeChat', input.value);
+        socket.emit('send-nickname', "trablo");
+        input.value = '';
+        }
+    });
+    socket.on('mensajeDeChat', function (mensaje) {
+        var item = document.createElement('li');
+        item.textContent = mensaje;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+    });
+    socket.on('new user', function (clients) {
+        var item = document.createElement('li');
+        item.textContent = clients;
+        users.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+    });
+    socket.on('alertCon',(username)=>{
+        alert(`${username} connected`);
+
+    });
+    socket.on('alertDisc',()=>{
+        alert("someone disconnected");
+    });
+    
+ </script>
+</body>
+</html>
